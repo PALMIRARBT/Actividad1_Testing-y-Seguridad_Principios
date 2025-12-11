@@ -57,7 +57,7 @@ function getPayload(token: string): JWTPayload {
   return jwt_decode(token);
 }
 
-function getToken(): Token | null {
+export function getToken(): Token | null {
   let token: Token;
   const tokenJson = localStorage.getItem(tokenKey);
   if (tokenJson) {
