@@ -1,4 +1,4 @@
-import * as connections from '@/config/connection/connection';
+import * as connections from '../../config/connection/connection';
 import { Document, Schema } from 'mongoose';
 
 /**
@@ -29,7 +29,7 @@ export type AuthToken = {
   kind: string;
 };
 
-const AboutMeSchema = new Schema<IAboutMeModel>(
+const AboutMeSchema = new Schema(
   {
     name: String,
     birthday: Number,
@@ -43,4 +43,4 @@ const AboutMeSchema = new Schema<IAboutMeModel>(
   }
 );
 
-export default connections.db.model<IAboutMeModel>('AboutMeModel', AboutMeSchema);
+export default connections.db.model('AboutMeModel', AboutMeSchema);

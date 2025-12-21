@@ -1,8 +1,8 @@
 import * as HttpStatus from 'http-status-codes';
 import * as jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
-import app from '@/config/server/server';
-import HttpError from '@/config/error';
+import app from '../server/server';
+import HttpError from '../error';
 import * as http from 'http';
 
 interface RequestWithUser extends Request {

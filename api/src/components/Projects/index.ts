@@ -1,5 +1,5 @@
 import ProjectsService from './service';
-import { HttpError } from '@/config/error';
+import HttpError from '../../config/error';
 import { IProjectsModel } from './model';
 import { NextFunction, Request, Response } from 'express';
 
@@ -29,9 +29,12 @@ export async function findAll(req: Request, res: Response, next: NextFunction): 
  */
 export async function findOne(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const aboutMe: IProjectsModel = await ProjectsService.findOne(req.params.id);
-
-    res.status(200).json(aboutMe);
+    const project: IProjectsModel | null = await ProjectsService.findOne(req.params.id);
+    if (!project) {
+      res.status(404).json({ message: 'Proyecto no encontrado' });
+      return;
+    }
+    res.status(200).json(project);
   } catch (error) {
     next(new HttpError(error.message.status, error.message));
   }
@@ -47,10 +50,9 @@ export async function findOne(req: Request, res: Response, next: NextFunction): 
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const aboutMe: IProjectsModel = await ProjectsService.insert(req.body);
-
     res.status(201).json(aboutMe);
   } catch (error) {
-    next(new HttpError(error.message.status, error.message));
+    res.status(400).json({ message: error.message });
   }
 }
 

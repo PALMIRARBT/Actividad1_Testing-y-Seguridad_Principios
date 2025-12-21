@@ -1,6 +1,6 @@
 import express from 'express';
-import * as Middleware from '@/config/middleware/middleware';
-import * as Routes from '@/routes';
+import * as Middleware from '../middleware/middleware';
+import * as Routes from '../../routes';
 
 /**
  * @constant {express.Application}
@@ -35,4 +35,13 @@ app.set('secret', process.env.SECRET || 'superSecret');
 /**
  * @exports {express.Application}
  */
+
+// Middleware de 404: debe ir después del error handler global
+app.use((req, res) => {
+	res.status(404).json({
+		status: 404,
+		message: 'Not Found'
+	});
+});
+
 export default app;

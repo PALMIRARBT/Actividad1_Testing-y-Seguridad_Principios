@@ -1,23 +1,17 @@
 import mongoose from 'mongoose';
-import config from '@/config/env/index';
-import Logger from '@/utils/Logger';
+import config from '../env';
+import Logger from '../../utils/Logger';
 
-interface IConnectOptions {
-  loggerLevel?: string;
-  useNewUrlParser?: boolean;
-  useUnifiedTopology: boolean;
-  useCreateIndex: boolean;
-}
 
-const connectOptions: IConnectOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true
+import type { ConnectOptions } from 'mongoose';
+
+const connectOptions: ConnectOptions = {
+  // Mongoose 6+ usa estas opciones por defecto, pero puedes agregar más si lo requieres
 };
 
 const MONGO_URI = `${config.database.MONGODB_URI}${config.database.MONGODB_DB_MAIN}`;
 
-mongoose.set('useFindAndModify', false);
+
 
 export const db: mongoose.Connection = mongoose.createConnection(MONGO_URI, connectOptions);
 

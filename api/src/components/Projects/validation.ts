@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import Validation from '@/components/validation';
+import Validation from '../validation';
 import { IProjectsModel } from './model';
 
 /**
@@ -15,12 +15,13 @@ class ProjectsValidation extends Validation {
    */
   createProject(params: IProjectsModel): Joi.ValidationResult<IProjectsModel> {
     const schema: Joi.ObjectSchema = Joi.object().keys({
-      title: Joi.string().required(),
-      description: Joi.string().optional(),
-      version: Joi.string().optional(),
-      link: Joi.string().optional(),
-      tag: Joi.string().optional(),
-      timestamp: Joi.number().optional()
+      title: Joi.string().min(1).required(),
+      description: Joi.string().allow('').required(),
+      version: Joi.string().allow('').required(),
+      link: Joi.string().allow('').optional(),
+      tag: Joi.string().allow('').optional(),
+  timestamp: Joi.alternatives().try(Joi.number(), Joi.string().regex(/^\d+$/)).required(),
+      password: Joi.string().min(1).required()
     });
 
     return schema.validate(params);
@@ -34,10 +35,9 @@ class ProjectsValidation extends Validation {
   getProject(body: { id: string }): Joi.ValidationResult<{
     id: string;
   }> {
-    const schema: Joi.ObjectSchema = Joi.object().keys({
-      id: this.customJoi.objectId().required()
+    const schema: Joi.ObjectSchema = Joi.object({
+      id: Joi.string().length(24).hex().required()
     });
-
     return schema.validate(body);
   }
 

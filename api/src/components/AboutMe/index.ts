@@ -1,5 +1,5 @@
 import AboutMeService from './service';
-import { HttpError } from '@/config/error';
+import HttpError from '../../config/error';
 import { IAboutMeModel } from './model';
 import { NextFunction, Request, Response } from 'express';
 
@@ -12,7 +12,7 @@ import { NextFunction, Request, Response } from 'express';
  */
 export async function findAll(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const aboutMeArray: IAboutMeModel = await AboutMeService.findAll();
+  const aboutMeArray: IAboutMeModel[] = await AboutMeService.findAll();
 
     res.status(200).json(aboutMeArray);
   } catch (error) {

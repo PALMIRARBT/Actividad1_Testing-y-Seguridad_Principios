@@ -1,11 +1,11 @@
 import HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
-import { IUserModel, IUserRequest } from '@/components/User/model';
-import HttpError from '@/config/error';
+import { IUserModel, IUserRequest } from '../User/model';
+import HttpError from '../../config/error';
 import AuthService from './service';
-import UserService from '@/components/User/service';
-import app from '@/config/server/server';
+import UserService from '../User/service';
+import app from '../../config/server/server';
 
 interface RequestWithUser extends Request {
   user: IUserRequest;

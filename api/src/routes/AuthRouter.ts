@@ -1,4 +1,4 @@
-import { AuthComponent } from '@/components';
+import { AuthComponent } from '../components';
 import { Router } from 'express';
 
 /**

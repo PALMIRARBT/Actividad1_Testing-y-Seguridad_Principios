@@ -1,5 +1,4 @@
-import * as connections from '@/config/connection/connection';
-import { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
 /**
  * @export
@@ -10,19 +9,21 @@ export interface IProjectsRequest {
   title: string;
 }
 
+
 /**
  * @export
  * @interface IProjectsModel
  * @extends {Document}
  */
 export interface IProjectsModel extends Document {
-  id: string;
+  _id: Types.ObjectId;
   title: string;
   description: string;
   version: string;
   link: string;
   tag: string;
   timestamp: number;
+  password: string;
 }
 
 export type AuthToken = {
@@ -30,14 +31,15 @@ export type AuthToken = {
   kind: string;
 };
 
-const ProjectsSchema = new Schema<IProjectsModel>(
+const ProjectsSchema = new Schema(
   {
-    title: String,
-    description: String,
-    version: String,
-    link: String,
-    tag: String,
-    timestamp: Number
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    version: { type: String, required: true },
+    link: { type: String, required: false },
+    tag: { type: String, required: false },
+    timestamp: { type: Number, required: true },
+    password: { type: String, required: true }
   },
   {
     collection: 'projects',
@@ -45,4 +47,4 @@ const ProjectsSchema = new Schema<IProjectsModel>(
   }
 );
 
-export default connections.db.model<IProjectsModel>('ProjectsModel', ProjectsSchema);
+export default mongoose.model('ProjectsModel', ProjectsSchema);

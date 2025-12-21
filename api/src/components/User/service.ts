@@ -3,12 +3,29 @@ import UserModel, { IUserModel } from './model';
 import UserValidation from './validation';
 import { IUserService } from './interface';
 import { Types } from 'mongoose';
+import HttpError from '../../config/error';
 
 /**
  * @export
  * @implements {IUserModelService}
  */
+/**
+ * @export
+ * @implements {IUserModelService}
+ */
 const UserService: IUserService = {
+  /**
+   * Busca un usuario por email
+   * @param {string} email
+   * @returns {Promise<IUserModel | null>}
+   */
+  async findByEmail(email: string): Promise<IUserModel | null> {
+    try {
+      return await UserModel.findOne({ email });
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  },
   /**
    * @returns {Promise < IUserModel[] >}
    * @memberof UserService
@@ -40,7 +57,7 @@ const UserService: IUserService = {
 
       return await UserModel.findOne(
         {
-          _id: Types.ObjectId(id)
+          _id: new Types.ObjectId(id)
         },
         {
           password: 0
@@ -56,19 +73,19 @@ const UserService: IUserService = {
    * @returns {Promise < IUserModel >}
    * @memberof UserService
    */
-  async insert(body: IUserModel): Promise<IUserModel> {
+  async insert(body: IUserModel): Promise<any> {
     try {
       const validate: Joi.ValidationResult<IUserModel> = UserValidation.createUser(body);
-
       if (validate.error) {
-        throw new Error(validate.error.message);
+        throw new HttpError(400, 'Error de validación: ' + validate.error.message);
       }
-
-      const user: IUserModel = await UserModel.create(body);
-
-      return user;
+  const user = await UserModel.create(body);
+  return user;
     } catch (error) {
-      throw new Error(error.message);
+      if (error instanceof HttpError) {
+        throw error;
+      }
+      throw new HttpError(400, error?.message || 'Error de validación');
     }
   },
 
@@ -77,7 +94,7 @@ const UserService: IUserService = {
    * @returns {Promise < IUserModel >}
    * @memberof UserService
    */
-  async remove(id: string): Promise<IUserModel> {
+  async remove(id: string): Promise<any> {
     try {
       const validate: Joi.ValidationResult<{
         id: string;
@@ -89,11 +106,8 @@ const UserService: IUserService = {
         throw new Error(validate.error.message);
       }
 
-      const user: IUserModel = await UserModel.findOneAndRemove({
-        _id: Types.ObjectId(id)
-      });
-
-      return user;
+    const user = await UserModel.findByIdAndDelete(new Types.ObjectId(id));
+    return user;
     } catch (error) {
       throw new Error(error.message);
     }

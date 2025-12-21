@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import Validation from '@/components/validation';
+import Validation from '../validation';
 import { IAboutMeModel } from './model';
 
 /**

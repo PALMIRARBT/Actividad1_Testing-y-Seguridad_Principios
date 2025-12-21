@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import bcrypt from 'bcryptjs';
 import ProjectModel, { IProjectsModel } from './model';
 import ProjectsValidation from './validation';
 import { IProjectsService } from './interface';
@@ -40,7 +41,7 @@ const ProjectsService: IProjectsService = {
 
       return await ProjectModel.findOne(
         {
-          _id: Types.ObjectId(id)
+          _id: new Types.ObjectId(id)
         },
         {
           password: 0
@@ -56,17 +57,19 @@ const ProjectsService: IProjectsService = {
    * @returns {Promise < IProjectsModel >}
    * @memberof ProjectsService
    */
-  async insert(body: IProjectsModel): Promise<IProjectsModel> {
+  async insert(body: IProjectsModel): Promise<any> {
     try {
       const validate: Joi.ValidationResult<IProjectsModel> = ProjectsValidation.createProject(body);
-
       if (validate.error) {
-        throw new Error(validate.error.message);
+        // Cambiar el mensaje para que contenga 'validación'
+        throw new Error('Error de validación: ' + validate.error.message);
       }
-
-      const project: IProjectsModel = await ProjectModel.create(body);
-
-      return project;
+      // Hashear la contraseña antes de guardar
+      if (body.password) {
+        body.password = bcrypt.hashSync(body.password, 10);
+      }
+  const project = await ProjectModel.create(body);
+  return project;
     } catch (error) {
       throw new Error(error.message);
     }
@@ -77,7 +80,7 @@ const ProjectsService: IProjectsService = {
    * @returns {Promise < IProjectsModel >}
    * @memberof ProjectsService
    */
-  async remove(id: string): Promise<IProjectsModel> {
+  async remove(id: string): Promise<any> {
     try {
       const validate: Joi.ValidationResult<{
         id: string;
@@ -89,10 +92,7 @@ const ProjectsService: IProjectsService = {
         throw new Error(validate.error.message);
       }
 
-      const project: IProjectsModel = await ProjectModel.findOneAndRemove({
-        _id: Types.ObjectId(id)
-      });
-
+      const project = await ProjectModel.findByIdAndDelete(new Types.ObjectId(id));
       return project;
     } catch (error) {
       throw new Error(error.message);

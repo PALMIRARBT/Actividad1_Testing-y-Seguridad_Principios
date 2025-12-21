@@ -1,4 +1,4 @@
-import { IUserModel } from '@/components/User/model';
+import { IUserModel } from '../User/model';
 import { DocumentDefinition } from 'mongoose';
 
 /**

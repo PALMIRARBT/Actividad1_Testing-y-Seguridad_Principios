@@ -3,7 +3,7 @@ alias.addAliases({
   '@': __dirname
 });
 
-import app from '@/config/server/server';
+import app from './config/server/server';
 
 const port = app.get('port') || 3000;
 app.listen(port, () => {

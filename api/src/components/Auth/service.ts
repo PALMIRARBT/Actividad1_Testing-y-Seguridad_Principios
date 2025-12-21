@@ -1,75 +1,28 @@
-import Joi from 'joi';
-import AuthValidation from './validation';
-import UserModel, { IUserModel } from '@/components/User/model';
-import { IAuthService } from './interface';
-import { DocumentDefinition } from 'mongoose';
 
-/**
- * @export
- * @implements {IAuthService}
- */
-const AuthService: IAuthService = {
-  /**
-   * @param {IUserModel} body
-   * @returns {Promise <IUserModel>}
-   * @memberof AuthService
-   */
-  async createUser(body: DocumentDefinition<IUserModel>): Promise<IUserModel> {
-    try {
-      const validate: Joi.ValidationResult<IUserModel> = AuthValidation.createUser(body);
+import UserService from '../User/service';
+import { IUserModel } from '../User/model';
 
-      if (validate.error) {
-        throw new Error(validate.error.message);
-      }
+const AuthService = {
+	async createUser(body: any): Promise<IUserModel> {
+		// Puedes agregar validaciones adicionales aquí si es necesario
+		return UserService.insert(body);
+	},
 
-      const user: IUserModel = new UserModel({
-        email: body.email,
-        password: body.password
-      });
-
-      const query: IUserModel = await UserModel.findOne({
-        email: body.email
-      });
-
-      if (query) {
-        throw new Error('This email already exists');
-      }
-
-      const saved: IUserModel = await user.save();
-
-      return saved;
-    } catch (error) {
-      throw new Error(error);
-    }
-  },
-  /**
-   * @param {IUserModel} body
-   * @returns {Promise <IUserModel>}
-   * @memberof AuthService
-   */
-  async getUser(body: IUserModel): Promise<IUserModel> {
-    try {
-      const validate: Joi.ValidationResult<IUserModel> = AuthValidation.getUser(body);
-
-      if (validate.error) {
-        throw new Error(validate.error.message);
-      }
-
-      const user: IUserModel = await UserModel.findOne({
-        email: body.email
-      });
-
-      const isMatched: boolean = user && (await user.comparePassword(body.password));
-
-      if (isMatched) {
-        return user;
-      }
-
-      throw new Error('Invalid password or email');
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
+	async getUser(body: any): Promise<IUserModel> {
+		// Busca usuario por email y compara contraseña
+		const user = await UserService.findByEmail(body.email);
+		if (!user) {
+			throw new Error('User not found');
+		}
+		// Si hay campo password, verifica
+		if (body.password && user.comparePassword) {
+			const match = await user.comparePassword(body.password);
+			if (!match) {
+				throw new Error('Invalid password');
+			}
+		}
+		return user;
+	}
 };
 
 export default AuthService;

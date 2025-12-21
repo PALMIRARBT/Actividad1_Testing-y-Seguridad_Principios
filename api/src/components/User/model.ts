@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import * as connections from '@/config/connection/connection';
+import * as connections from '../../config/connection/connection';
 import { Document, Schema } from 'mongoose';
 import { NextFunction } from 'express';
 
@@ -33,7 +33,7 @@ export type AuthToken = {
   kind: string;
 };
 
-const UserSchema = new Schema<IUserModel>(
+const UserSchema = new Schema(
   {
     email: {
       type: String,
@@ -79,4 +79,4 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
   }
 };
 
-export default connections.db.model<IUserModel>('UserModel', UserSchema);
+export default connections.db.model('UserModel', UserSchema);

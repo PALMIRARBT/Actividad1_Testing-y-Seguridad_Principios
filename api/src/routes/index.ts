@@ -1,15 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import * as express from 'express';
-import * as http from 'http';
-import * as jwtConfig from '@/config/middleware/jwtAuth';
+import * as jwtConfig from '../config/middleware/jwtAuth';
 import * as swaggerUi from 'swagger-ui-express';
 import AuthRouter from './AuthRouter';
 import UserRouter from './UserRouter';
 import AboutMeRouter from './AboutMeRouter';
 import ProjectsRouter from './ProjectsRouter';
 
-type Request = express.Request;
-type Response = express.Response;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 let swaggerDoc: Object;
@@ -31,12 +28,11 @@ try {
 export function init(app: express.Application): void {
   const router: express.Router = express.Router();
 
-  /**
-   * @description
-   *  Forwards any requests to the /v1/users URI to our UserRouter
-   *  Also, check if user authenticated
-   * @constructs
-   */
+  // Ruta pública para crear usuario (registro)
+  const { create } = require('../components/User');
+  app.post('/v1/users', create);
+
+  // Rutas protegidas para usuarios (requieren JWT)
   app.use('/v1/users', jwtConfig.isAuthenticated, UserRouter);
 
   /**
@@ -72,13 +68,6 @@ export function init(app: express.Application): void {
     app.get('/docs', swaggerUi.setup(swaggerDoc));
   }
 
-  /**
-   * @description No results returned mean the object is not found
-   * @constructs
-   */
-  app.use((req: Request, res: Response) => {
-    res.status(404).send(http.STATUS_CODES[404]);
-  });
 
   /**
    * @constructs all routes

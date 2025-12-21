@@ -5,9 +5,9 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import { HttpError } from '@/config/error';
-import { sendHttpErrorModule } from '@/config/error/sendHttpError';
-import Logger from '@/utils/Logger';
+import HttpError from '../error';
+import { sendHttpErrorModule } from '../error/sendHttpError';
+import Logger from '../../utils/Logger';
 
 
 /**
@@ -49,20 +49,53 @@ interface CustomResponse extends express.Response {
  * @param {express.Application} app
  */
 export function initErrorHandler(app: express.Application): void {
-  app.use((error: Error, req: express.Request, res: CustomResponse) => {
+  app.use((error: Error, req: express.Request, res: CustomResponse, next: express.NextFunction) => {
     if (typeof error === 'number') {
       error = new HttpError(error); // next(404)
     }
 
     if (error instanceof HttpError) {
-      res.sendHttpError(error);
+      if (typeof res.sendHttpError === 'function') {
+        res.sendHttpError(error);
+      } else {
+        const status = (error && typeof (error as any).status === 'number') ? (error as any).status : 500;
+        const name = (error && (error as any).name) ? (error as any).name : 'Error';
+        const message = (error && (error as any).message) ? (error as any).message : 'Internal Server Error';
+        res.status(status).json({
+          status,
+          name,
+          message
+        });
+      }
     } else {
       if (app.get('env') === 'development') {
         error = new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, error.message);
-        res.sendHttpError(error);
+        if (typeof res.sendHttpError === 'function') {
+          res.sendHttpError(error);
+        } else {
+          const status = (error && typeof (error as any).status === 'number') ? (error as any).status : 500;
+          const name = (error && (error as any).name) ? (error as any).name : 'Error';
+          const message = (error && (error as any).message) ? (error as any).message : 'Internal Server Error';
+          res.status(status).json({
+            status,
+            name,
+            message
+          });
+        }
       } else {
         error = new HttpError(HttpStatus.INTERNAL_SERVER_ERROR);
-        res.sendHttpError(error, error.message);
+        if (typeof res.sendHttpError === 'function') {
+          res.sendHttpError(error, error.message);
+        } else {
+          const status = (error && typeof (error as any).status === 'number') ? (error as any).status : 500;
+          const name = (error && (error as any).name) ? (error as any).name : 'Error';
+          const message = (error && (error as any).message) ? (error as any).message : 'Internal Server Error';
+          res.status(status).json({
+            status,
+            name,
+            message
+          });
+        }
       }
     }
 

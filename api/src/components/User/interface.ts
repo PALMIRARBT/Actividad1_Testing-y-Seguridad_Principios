@@ -1,3 +1,4 @@
+
 import { IUserModel } from './model';
 
 /**
@@ -31,4 +32,11 @@ export interface IUserService {
    * @memberof IUserService
    */
   remove(id: string): Promise<IUserModel>;
+
+  /**
+   * Busca un usuario por email
+   * @param {string} email
+   * @returns {Promise<IUserModel | null>}
+   */
+  findByEmail(email: string): Promise<IUserModel | null>;
 }

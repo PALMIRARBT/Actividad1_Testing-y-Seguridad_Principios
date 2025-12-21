@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import Validation from '@/components/validation';
+import Validation from '../validation';
 import { IUserModel } from './model';
 
 /**
@@ -15,12 +15,12 @@ class UserValidation extends Validation {
    */
   createUser(params: IUserModel): Joi.ValidationResult<IUserModel> {
     const schema: Joi.ObjectSchema = Joi.object().keys({
-      name: Joi.string().required(),
       email: Joi.string()
         .email({
           minDomainSegments: 2
         })
-        .required()
+        .required(),
+      password: Joi.string().min(6).required()
     });
 
     return schema.validate(params);
